@@ -13,12 +13,12 @@ public class LlamaMechanics : MonoBehaviour {
     Vector2 resetPos;
     float forceMultiplier;
     float countdown;
-    float timeout;
    
     bool launched;
 
     public LevelManager lvlMan;
-
+    public AudioClip noise;
+    private AudioSource src;
 
 
 	// Use this for initialization
@@ -28,11 +28,11 @@ public class LlamaMechanics : MonoBehaviour {
         cam = Camera.main;
         forceMultiplier = 500f;
         launched = false;
-        timeout = 7f;
-        countdown = timeout;
+        countdown = lvlMan.timeout;
         resetPos = transform.position;
 
         lvlMan = GameObject.Find("LevelManager").GetComponent<LevelManager>();
+        src = GetComponent<AudioSource>();
 		
 	}
 	
@@ -44,7 +44,7 @@ public class LlamaMechanics : MonoBehaviour {
             lvlMan.gameover.text = "Game Over";
             lvlMan.goTimer += Time.deltaTime;
 
-            if (lvlMan.goTimer >= timeout)
+            if (lvlMan.goTimer >= lvlMan.timeout)
             {
                 SceneManager.LoadScene("Title");
             }
@@ -71,7 +71,7 @@ public class LlamaMechanics : MonoBehaviour {
                 //Debug.Log(slingEnd);
                 llama.AddForce((slingStart - slingEnd) * forceMultiplier);
                 launched = true;
-                countdown = timeout;
+                countdown = lvlMan.timeout;
             }
         }
 		
@@ -95,5 +95,10 @@ public class LlamaMechanics : MonoBehaviour {
         lvlMan.numLlamas--;
         lvlMan.lives.text = "Llamas: " + lvlMan.numLlamas;
         
+    }
+
+    void OnCollisionEnter2D(Collision2D llama)
+    {
+        src.PlayOneShot(noise, 1f);
     }
 }
